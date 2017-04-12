@@ -1,0 +1,114 @@
+<html>
+<head>
+	<title>首页</title>
+	<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="HandheldFriendly" content="true" />
+<meta http-equiv="imagetoolbar" content="no" />
+<meta name="format-detection" content="telephone=no" />
+
+</head>
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 600px;height:400px;"></div>
+    
+<script type="text/javascript" src="js/assets/jquery2.1.4.js"></script>
+<script type="text/javascript" src="http://echarts.baidu.com/dist/echarts.js"></script>
+<script type="text/javascript" src="http://echarts.baidu.com/dist/echarts.min.js"></script>
+<script type="text/javascript">
+     
+var myChart = echarts.init(document.getElementById('main'));
+function splitData(rawData) {
+    var categoryData = [];
+    var values = [];
+    var volumns = [];
+   	console.log(rawData.length)
+    for (var i = 0; i < rawData.length; i++) {
+    	console.log(rawData[i])
+        categoryData.push(rawData[i].Timestamp);
+        values.push(rawData[i].Price_rur);
+        volumns.push(rawData[i].Volume_24h);
+    }
+    console.log(volumns);
+    console.log(values)
+    return {
+        categoryData: categoryData,
+        values: values,
+        volumns: volumns
+    };
+}
+
+function calculateMA(dayCount, data) {
+    var result = [];
+    for (var i = 0, len = data.values.length; i < len; i++) {
+        if (i < dayCount) {
+            result.push('-');
+            continue;
+        }
+        var sum = 0;
+        for (var j = 0; j < dayCount; j++) {
+            sum += data.values[i - j][1];
+        }
+        result.push(+(sum / dayCount).toFixed(3));
+    }
+    return result;
+}
+
+$.get('1.json', function (rawData) {
+	var categoryData = [],
+		dataArr = [];
+
+    $.each(rawData.Markets, function(i, o){
+    	
+    	categoryData.push(o.Timestamp);
+    	dataArr.push(o.Price_rur);
+    });
+console.log(dataArr)
+	var option = {
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['邮件营销']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            boundaryGap : false,
+	            data : categoryData
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value'
+	        }
+	    ],
+	    series : [
+	        {
+	            name:'邮件营销',
+	            type:'line',
+	            stack: '总量',
+	            data: dataArr
+	        }
+	    ]
+	};
+	                    
+
+
+	myChart.setOption(option);
+
+	});
+    </script>
+</body>
+</html>
