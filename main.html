@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+
+</body>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/underscore-min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript">
+$.getJSON("22.json",function(data){
+	//时间相隔 15s
+	/*
+	console.log((new Date(1500826500*1000)).format('yyyy-MM-dd hh:mm'));
+	console.log((new Date(1500827400*1000)).format('yyyy-MM-dd hh:mm'))*/
+	// 设置初始日期
+	var sTime = (new Date("2017-07-17 0:00")).getTime()/1000, // 开始时间 
+		eTime = (new Date("2017-07-18 0:00")).getTime()/1000; // 结束时间 
+	
+
+
+	// 存储时期内的数据
+	var newArr = [];
+	$.each(data, function(i, o){		
+		if(o[0] >= sTime && o[0] < eTime){
+			var json = {
+				date: (new Date(o[0]*1000)).format('yyyy-MM-dd hh:mm'),
+				time: o[0],
+				lowPrice1: o[1],
+				highPrice1: o[2],
+				lowPrice2: o[3],
+				highPrice2: o[4],
+				singleVolume: o[5]
+			}
+			newArr.push(json)
+		}
+	});
+	// 单价最高值	
+	var highPriceJson1 = _.max(newArr, function(stooge){ return stooge.highPrice1; });
+	var highPriceJson2 = _.max(newArr, function(stooge){ return stooge.highPrice2; });
+	console.log(highPriceJson1)
+	console.log(highPriceJson2)
+	// 15s里量最大
+	var singleVolumeJson = _.max(newArr, function(stooge){ return stooge.singleVolume; });
+	console.log(singleVolumeJson)
+	// 当天总量
+	var totalVolume = 0;
+	$.each(newArr, function(i, o){
+		totalVolume += o.singleVolume;
+	});
+	console.log(totalVolume)
+
+	
+	
+});  
+
+</script>
+</html>

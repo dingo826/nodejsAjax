@@ -6,7 +6,7 @@ var https = require('https'),
 fnLoad();
 
 function fnLoad(){
-	https.get("https://www.worldcoinindex.com/apiservice/json?key=IGjD81kLunvK3IxD2AxUPY6Gt", function(res) {
+	https.get("https://plugin.sosobtc.com/widgetembed/data/period?symbol=yunbisccny&step=900", function(res) {
 		var size = 0,
 			chunks = [];
 		res.on('data', function(chunk){
