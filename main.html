@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title></title>
+	<meta http-equiv="Content-Type" content="text/html;" charset="utf-8" />
 </head>
 <body>
 
@@ -10,51 +11,147 @@
 <script type="text/javascript" src="js/underscore-min.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript">
-$.getJSON("22.json",function(data){
-	//时间相隔 15s
-	/*
-	console.log((new Date(1500826500*1000)).format('yyyy-MM-dd hh:mm'));
-	console.log((new Date(1500827400*1000)).format('yyyy-MM-dd hh:mm'))*/
-	// 设置初始日期
-	var sTime = (new Date("2017-07-17 0:00")).getTime()/1000, // 开始时间 
-		eTime = (new Date("2017-07-18 0:00")).getTime()/1000; // 结束时间 
-	
+var symbolArr = ['yunbibtccny', 'yunbiethcny', 
+				'yunbidgdcny', 'yunbieoscny', 'yunbisccny',
+				'yunbi1stcny', 'yunbianscny', 'yunbietccny', 
+				'yunbigntcny', 'yunbiqtumcny', 'yunbibtscny', 'yunbigxscny'];
+
+var storageArr = [];
+symbolArr.forEach(function(e){
+	fnLoad(e)
+});
+//['price', 'buy', 'sell', 'high', 'low', 'vol']
+function fnLoad(e){
+	$.getJSON("json/"+e+".json",function(data){
+		//时间相隔 15s
+		/*
+		console.log((new Date(1500826500*1000)).format('yyyy-MM-dd hh:mm'));
+		console.log((new Date(1500827400*1000)).format('yyyy-MM-dd hh:mm'))*/
+		// 设置初始日期
+		var today = "2017-07-26" + e;
+		var sTime = (new Date("2017-07-26 0:00")).getTime()/1000, // 开始时间 
+			eTime = (new Date("2017-07-27 0:00")).getTime()/1000, // 结束时间 
+			sixTime = (new Date("2017-07-26 6:00")).getTime()/1000, // 6点 
+			twelveTime = (new Date("2017-07-26 12:00")).getTime()/1000, // 12点 
+			nineTime = (new Date("2017-07-26 21:00")).getTime()/1000; // 21点 
+		// 存储时期内的数据
+		var newArr = [],
+			sixArr = [],
+			twelveArr = [],
+			nineArr = [];
+		$.each(data, function(i, o){		
+			if(o[0] >= sTime && o[0] < eTime){
+				var json = {
+					date: (new Date(o[0]*1000)).format('hh:mm'),
+					time: o[0],
+					buy: o[1],
+					sell: o[2],
+					high: o[3],
+					low: o[4],
+					singleVolume: o[5]
+				}
 
 
-	// 存储时期内的数据
-	var newArr = [];
-	$.each(data, function(i, o){		
-		if(o[0] >= sTime && o[0] < eTime){
-			var json = {
-				date: (new Date(o[0]*1000)).format('yyyy-MM-dd hh:mm'),
-				time: o[0],
-				lowPrice1: o[1],
-				highPrice1: o[2],
-				lowPrice2: o[3],
-				highPrice2: o[4],
-				singleVolume: o[5]
+				newArr.push(json)
 			}
-			newArr.push(json)
-		}
-	});
-	// 单价最高值	
-	var highPriceJson1 = _.max(newArr, function(stooge){ return stooge.highPrice1; });
-	var highPriceJson2 = _.max(newArr, function(stooge){ return stooge.highPrice2; });
-	console.log(highPriceJson1)
-	console.log(highPriceJson2)
-	// 15s里量最大
-	var singleVolumeJson = _.max(newArr, function(stooge){ return stooge.singleVolume; });
-	console.log(singleVolumeJson)
-	// 当天总量
-	var totalVolume = 0;
-	$.each(newArr, function(i, o){
-		totalVolume += o.singleVolume;
-	});
-	console.log(totalVolume)
+			if(o[0] >= sTime && o[0] < sixTime){
+				var json = {
+					date: (new Date(o[0]*1000)).format('hh:mm'),
+					time: o[0],
+					buy: o[1],
+					sell: o[2],
+					high: o[3],
+					low: o[4],
+					singleVolume: o[5]
+				}
+				sixArr.push(json)
+			}
+			if(o[0] >= sTime && o[0] < twelveTime){
+				var json = {
+					date: (new Date(o[0]*1000)).format('hh:mm'),
+					time: o[0],
+					buy: o[1],
+					sell: o[2],
+					high: o[3],
+					low: o[4],
+					singleVolume: o[5]
+				}
+				twelveArr.push(json)
+			}
+			if(o[0] >= sTime && o[0] < nineTime){
+				var json = {
+					date: (new Date(o[0]*1000)).format('hh:mm'),
+					time: o[0],
+					buy: o[1],
+					sell: o[2],
+					high: o[3],
+					low: o[4],
+					singleVolume: o[5]
+				}
+				nineArr.push(json)
+			}
+		});
+		// 单价最高值	
+		var newHighPriceJson = _.max(newArr, function(stooge){ return stooge.high; });
+		//console.log(newHighPriceJson)
+		//console.log(today + ' 单价最高值:' )
+		//console.table({newHighPriceJson}, ['date', 'highPrice1', 'highPrice2'])
 
+
+		// 单价最低值	
+		var newLowPriceJson = _.min(newArr, function(stooge){ return stooge.low; });
 	
+		//console.log(today + ' 单价最低值:' )
+		//console.table( {newLowPriceJson}, ['date', 'lowPrice1', 'lowPrice2'])
+		// 15s里量最大
+		var singleVolumeJson = _.max(newArr, function(stooge){ return stooge.singleVolume; });
+		//console.log(today + ' 15s里量最大:')
+		//console.table({singleVolumeJson})
+		// 当天总量
+		var totalVolume = 0;
+		$.each(newArr, function(i, o){
+			totalVolume += o.singleVolume;
+		});
+		//量时间最高最低
+		//console.log(today + ' 当天总量:' + totalVolume);
+		// 6点总量
+		var sixTotalVolume = 0;
+		$.each(sixArr, function(i, o){
+			sixTotalVolume += o.singleVolume;
+		});
+		//console.log(today + ' 6点总量:' + sixTotalVolume);
+		// 12点总量
+		var twelveTotalVolume = 0;
+		$.each(twelveArr, function(i, o){
+			twelveTotalVolume += o.singleVolume;
+		});
+		//console.log(today + ' 12点总量:' + twelveTotalVolume);
+		// 21点总量
+		var nineTotalVolume = 0;
+		$.each(nineArr, function(i, o){
+			nineTotalVolume += o.singleVolume;
+		});
+		//console.log(today + ' 21点总量:' + nineTotalVolume);
+
+		var signJson = {
+			'日期': today,
+			'类别': e,
+			'零点开盘': newArr[0].buy,
+			'单价最高': newHighPriceJson.high,
+			'最高时间点': newHighPriceJson.date,
+			'单价最低': newLowPriceJson.date,
+			'最低时间点': newLowPriceJson.low,
+			'6点交易量': sixTotalVolume,
+			'12点交易量': twelveTotalVolume,
+			'21点交易量': nineTotalVolume,
+			'交易量最高时间点': singleVolumeJson.singleVolume,
+			'当天交易总量': totalVolume
+		} 
+		console.table({signJson})
+	}); 
 	
-});  
+}
 
 </script>
 </html>
+
